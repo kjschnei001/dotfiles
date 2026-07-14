@@ -1,1 +1,52 @@
-{}
+{
+  "permissions": {
+    "allow": [
+      "Bash(awk:*)",
+      "Bash(cat:*)",
+      "Bash(diff:*)",
+      "Bash(du:*)",
+      "Bash(file:*)",
+      "Bash(find:*)",
+      "Bash(gh pr create:*)",
+      "Bash(gh search:*)",
+      "Bash(git commit:*)",
+      "Bash(grep:*)",
+      "Bash(head:*)",
+      "Bash(ls:*)",
+      "Bash(sed:*)",
+      "Bash(stat:*)",
+      "Bash(tail:*)",
+      "Bash(type:*)",
+      "Bash(wc:*)",
+      "Bash(which:*)",
+      "Glob",
+      "Grep",
+      "Read",
+      "WebSearch",
+      "mcp__claude_ai_Datadog_MCP__aggregate_*",
+      "mcp__claude_ai_Datadog_MCP__analyze_datadog_*",
+      "mcp__claude_ai_Datadog_MCP__describe_datadog_*",
+      "mcp__claude_ai_Datadog_MCP__get_datadog_*",
+      "mcp__claude_ai_Datadog_MCP__list_datadog_*",
+      "mcp__claude_ai_Datadog_MCP__load_datadog_skill",
+      "mcp__claude_ai_Datadog_MCP__search_datadog_*",
+      "mcp__claude_ai_Slack__slack_read_thread",
+      "mcp__datadog-mcp__aggregate_*",
+      "mcp__datadog-mcp__analyze_datadog_*",
+      "mcp__datadog-mcp__describe_datadog_*",
+      "mcp__datadog-mcp__get_datadog_*",
+      "mcp__datadog-mcp__list_datadog_*",
+      "mcp__datadog-mcp__load_datadog_skill",
+      "mcp__datadog-mcp__search_datadog_*"
+    ],
+    "deny": [
+      "Bash(gh pr merge:*)",
+      "Bash(gh merge:*)",
+      "Bash(gt merge:*)"
+    ]
+  },
+  "model": "opus[1m]",
+  "effortLevel": "xhigh",
+  "theme": "dark",
+  "skipAutoPermissionPrompt": true
+}
