@@ -27,9 +27,38 @@ link_items "$ROOT/claude/commands" "$CONFIG_DIR/commands"
 link_items "$ROOT/claude/hooks" "$CONFIG_DIR/hooks"
 link_items "$ROOT/claude/rules" "$CONFIG_DIR/rules"
 
-# settings.json: link only if the container doesn't already have one (no clobber).
-if [ -f "$ROOT/claude/settings.json" ] && [ ! -e "$CONFIG_DIR/settings.json" ]; then
-  ln -sfn "$ROOT/claude/settings.json" "$CONFIG_DIR/settings.json"
+# settings.json: rdev (and other setups) already ship a settings.json with plugins and
+# hooks, so don't clobber it — merge ours in. Union our permissions (allow/deny) and fill
+# our prefs (model/effort/theme/skipAutoPermissionPrompt) only where unset, preserving
+# their plugins/hooks/marketplaces. Idempotent: re-running only unions. Falls back to a
+# no-clobber copy when there's nothing there, or a link if jq is unavailable.
+REPO_SETTINGS="$ROOT/claude/settings.json"
+DEST_SETTINGS="$CONFIG_DIR/settings.json"
+if [ -f "$REPO_SETTINGS" ]; then
+  if [ -f "$DEST_SETTINGS" ] && command -v jq >/dev/null 2>&1; then
+    tmp="$(mktemp "${DEST_SETTINGS}.XXXXXX")"
+    if jq -s '
+        .[0] as $e | .[1] as $o | $e
+        | .permissions = (($e.permissions // {}) * {
+            allow: (($e.permissions.allow // []) + (($o.permissions.allow // []) - ($e.permissions.allow // []))),
+            deny:  (($e.permissions.deny  // []) + (($o.permissions.deny  // []) - ($e.permissions.deny  // [])))
+          })
+        | .model = ($e.model // $o.model)
+        | .effortLevel = ($e.effortLevel // $o.effortLevel)
+        | .theme = ($e.theme // $o.theme)
+        | .skipAutoPermissionPrompt = ($e.skipAutoPermissionPrompt // $o.skipAutoPermissionPrompt)
+      ' "$DEST_SETTINGS" "$REPO_SETTINGS" > "$tmp" && [ -s "$tmp" ]; then
+      chmod 644 "$tmp"
+      mv "$tmp" "$DEST_SETTINGS"
+      echo "merged settings.json into $DEST_SETTINGS"
+    else
+      rm -f "$tmp"
+      echo "settings.json merge failed; left existing file untouched" >&2
+    fi
+  elif [ ! -e "$DEST_SETTINGS" ]; then
+    cp "$REPO_SETTINGS" "$DEST_SETTINGS"
+    echo "installed settings.json at $DEST_SETTINGS"
+  fi
 fi
 
 echo "kschneider Claude Code dotfiles applied to $CONFIG_DIR"
