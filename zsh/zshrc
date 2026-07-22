@@ -1,6 +1,15 @@
 export ENABLE_TYPECHECK_PATREON_PY=1
 export PATH="$HOME/.local/bin:$PATH"
 
+# Editor: prefer VS Code, else vim. --wait makes `code` block until the tab is
+# closed, which git commit and other tools require of an editor.
+if command -v code >/dev/null 2>&1; then
+  export EDITOR="code --wait"
+else
+  export EDITOR="vim"
+fi
+export VISUAL="$EDITOR"
+
 # Enable oh-my-zsh and its plugins.
 export ZSH="$HOME/.oh-my-zsh"
 ZSH_THEME="robbyrussell"
