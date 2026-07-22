@@ -66,5 +66,20 @@
   },
   "effortLevel": "xhigh",
   "theme": "dark",
-  "skipAutoPermissionPrompt": true
+  "skipAutoPermissionPrompt": true,
+  "enabledPlugins": {
+    "patreon@patreon_agent": true,
+    "patreon-experimental@patreon_agent": true,
+    "patreon-circleci@patreon_agent": true,
+    "patreon-databricks@patreon_agent": true,
+    "patreon-infra@patreon_agent": true
+  },
+  "extraKnownMarketplaces": {
+    "patreon_agent": {
+      "source": {
+        "source": "github",
+        "repo": "Patreon/patreon_agent"
+      }
+    }
+  }
 }

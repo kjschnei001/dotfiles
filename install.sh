@@ -28,10 +28,12 @@ link_items "$ROOT/claude/hooks" "$CONFIG_DIR/hooks"
 link_items "$ROOT/claude/rules" "$CONFIG_DIR/rules"
 
 # settings.json: rdev (and other setups) already ship a settings.json with plugins and
-# hooks, so don't clobber it — merge ours in. Union our permissions (allow/deny) and fill
-# our prefs (model/effort/theme/skipAutoPermissionPrompt) only where unset, preserving
-# their plugins/hooks/marketplaces. Idempotent: re-running only unions. Falls back to a
-# no-clobber copy when there's nothing there, or a link if jq is unavailable.
+# hooks, so don't clobber it — merge ours in. Union our permissions (allow/deny),
+# enabledPlugins, and extraKnownMarketplaces (existing entries win on conflict, so a
+# machine's own plugins are preserved), and fill our prefs
+# (model/effort/theme/skipAutoPermissionPrompt) only where unset. Hooks are left as-is.
+# Idempotent: re-running only unions. Falls back to a no-clobber copy when there's nothing
+# there, or a link if jq is unavailable.
 REPO_SETTINGS="$ROOT/claude/settings.json"
 DEST_SETTINGS="$CONFIG_DIR/settings.json"
 if [ -f "$REPO_SETTINGS" ]; then
@@ -47,6 +49,8 @@ if [ -f "$REPO_SETTINGS" ]; then
         | .effortLevel = ($e.effortLevel // $o.effortLevel)
         | .theme = ($e.theme // $o.theme)
         | .skipAutoPermissionPrompt = ($e.skipAutoPermissionPrompt // $o.skipAutoPermissionPrompt)
+        | .enabledPlugins = (($o.enabledPlugins // {}) + ($e.enabledPlugins // {}))
+        | .extraKnownMarketplaces = (($o.extraKnownMarketplaces // {}) + ($e.extraKnownMarketplaces // {}))
       ' "$DEST_SETTINGS" "$REPO_SETTINGS" > "$tmp" && [ -s "$tmp" ]; then
       chmod 644 "$tmp"
       mv "$tmp" "$DEST_SETTINGS"
