@@ -7,7 +7,7 @@ set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 CONFIG_DIR="${CLAUDE_CONFIG_DIR:-$HOME/.claude}"
-mkdir -p "$CONFIG_DIR/skills" "$CONFIG_DIR/commands" "$CONFIG_DIR/hooks" "$CONFIG_DIR/rules"
+mkdir -p "$CONFIG_DIR/skills" "$CONFIG_DIR/commands" "$CONFIG_DIR/hooks" "$CONFIG_DIR/rules" "$CONFIG_DIR/output-styles"
 
 # Per-item symlinks: personal resources coexist with plugin/base-image ones,
 # and edits in this repo take effect without re-running.
@@ -26,12 +26,13 @@ link_items "$ROOT/claude/skills" "$CONFIG_DIR/skills"
 link_items "$ROOT/claude/commands" "$CONFIG_DIR/commands"
 link_items "$ROOT/claude/hooks" "$CONFIG_DIR/hooks"
 link_items "$ROOT/claude/rules" "$CONFIG_DIR/rules"
+link_items "$ROOT/claude/output-styles" "$CONFIG_DIR/output-styles"
 
 # settings.json: rdev (and other setups) already ship a settings.json with plugins and
 # hooks, so don't clobber it — merge ours in. Union our permissions (allow/deny),
 # enabledPlugins, and extraKnownMarketplaces (existing entries win on conflict, so a
 # machine's own plugins are preserved), and fill our prefs
-# (model/effort/theme/skipAutoPermissionPrompt) only where unset. Hooks are left as-is.
+# (model/effort/theme/outputStyle/skipAutoPermissionPrompt) only where unset. Hooks are left as-is.
 # Idempotent: re-running only unions. Falls back to a no-clobber copy when there's nothing
 # there, or a link if jq is unavailable.
 REPO_SETTINGS="$ROOT/claude/settings.json"
@@ -48,6 +49,7 @@ if [ -f "$REPO_SETTINGS" ]; then
         | .model = ($e.model // $o.model)
         | .effortLevel = ($e.effortLevel // $o.effortLevel)
         | .theme = ($e.theme // $o.theme)
+        | .outputStyle = ($e.outputStyle // $o.outputStyle)
         | .skipAutoPermissionPrompt = ($e.skipAutoPermissionPrompt // $o.skipAutoPermissionPrompt)
         | .enabledPlugins = (($o.enabledPlugins // {}) + ($e.enabledPlugins // {}))
         | .extraKnownMarketplaces = (($o.extraKnownMarketplaces // {}) + ($e.extraKnownMarketplaces // {}))

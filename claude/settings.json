@@ -81,5 +81,6 @@
         "repo": "Patreon/patreon_agent"
       }
     }
-  }
+  },
+  "outputStyle": "Concise"
 }
