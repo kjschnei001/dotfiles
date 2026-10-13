@@ -32,7 +32,7 @@ link_items "$ROOT/claude/output-styles" "$CONFIG_DIR/output-styles"
 # hooks, so don't clobber it — merge ours in. Union our permissions (allow/deny),
 # enabledPlugins, and extraKnownMarketplaces (existing entries win on conflict, so a
 # machine's own plugins are preserved), and fill our prefs
-# (model/effort/theme/outputStyle/skipAutoPermissionPrompt) only where unset. Hooks are left as-is.
+# (model/effort/theme/outputStyle/skipAutoPermissionPrompt/cleanupPeriodDays) only where unset. Hooks are left as-is.
 # Idempotent: re-running only unions. Falls back to a no-clobber copy when there's nothing
 # there, or a link if jq is unavailable.
 REPO_SETTINGS="$ROOT/claude/settings.json"
@@ -51,6 +51,7 @@ if [ -f "$REPO_SETTINGS" ]; then
         | .theme = ($e.theme // $o.theme)
         | .outputStyle = ($e.outputStyle // $o.outputStyle)
         | .skipAutoPermissionPrompt = ($e.skipAutoPermissionPrompt // $o.skipAutoPermissionPrompt)
+        | .cleanupPeriodDays = ($e.cleanupPeriodDays // $o.cleanupPeriodDays)
         | .enabledPlugins = (($o.enabledPlugins // {}) + ($e.enabledPlugins // {}))
         | .extraKnownMarketplaces = (($o.extraKnownMarketplaces // {}) + ($e.extraKnownMarketplaces // {}))
       ' "$DEST_SETTINGS" "$REPO_SETTINGS" > "$tmp" && [ -s "$tmp" ]; then

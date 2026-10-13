@@ -82,5 +82,6 @@
       }
     }
   },
-  "outputStyle": "Concise"
+  "outputStyle": "Concise",
+  "cleanupPeriodDays": 365
 }
